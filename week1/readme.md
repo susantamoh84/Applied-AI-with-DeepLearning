@@ -101,7 +101,13 @@
     
     #predict labels
     predict(x_test, batch_size=32)```
-    
-    
+       
+# Feed Forward Networks
+
+  - Building blocks for MLPs
   
+    - Dense layers with activations
+    - Use Dropout for regularization
+    - Build a Sequential model from Dense and Dropout layers
+    
   

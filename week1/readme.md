@@ -17,11 +17,11 @@
   
   - A minimal Keras example:
   
-    - from keras.models import Sequential
-    - from keras.layers import Dense
-    - from keras.optimizers import SGD
+    ```from keras.models import Sequential
+    from keras.layers import Dense
+    from keras.optimizers import SGD
     
-    ```#load data
+    #load data
     from keras.datasets import mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     

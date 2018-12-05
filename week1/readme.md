@@ -21,9 +21,9 @@
     - from keras.layers import Dense
     - from keras.optimizers import SGD
     
-    - #load data
-    - from keras.datasets import mnist
-    - (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    ```#load data
+    from keras.datasets import mnist
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
     
     - #Define model
     - model = Sequential()
@@ -35,7 +35,7 @@
     - model.compile(loss='catgorical_crossentropy', optimizer=SGD(), metric=['accuracy'])
     
     - #Train network
-    - model.fit(x_train, y_train, batch_size=128, apochs=10, validation_data=(x_test, y_test))
+    - model.fit(x_train, y_train, batch_size=128, apochs=10, validation_data=(x_test, y_test))```
     
   - Install Keras
   

@@ -169,7 +169,136 @@
     
     #above model 98% accuracy ```
     
+  - Recurrent neural networks
+  
+    - Available RNNs in keras
+      - SimpleRNN - basic RNN
+      - GRU - Gated Recursive UNit (2014)
+      - LSTM - Long short-term memory (1997)
+      
+    - LSTM layers
+    
+      ```from keras.layers.recurrent import LSTM
+      
+      LSTM(units,
+            activation='tanh',
+            recurrent_activation='hard_sigmoid',
+            recurrent_initializer='orthogonal',
+            recurrent_regularizer=Nope,
+            dropout=0.0, recurrent_dropout=0.0,
+            return_sequences=False)               #If return_sequences=True, then return all the values in matrix
 
+      # Embedding layers for first layer only
+      # Transform integers into vectors of same length: Example: [3, 12] embedded as [[0.1, 0.5], [1.3 4.2]]
+      # Embed a vocabulary into a vector space, apply to sentences; 2-D input mapped to 3-D output, connects to LSTMs
+      
+      from keras.layers.embeddings import Embedding
+      
+      Embedding(input_dim,                        # Vocabulary size
+                output_dim,                       # Ouput vector length
+                embeddings_initializer='uniform',
+                mask_zero=False)                  # Mask zero values```
+                
+    - Sentiment classification for movie reviews
+    
+      - 25,000 movie reviews from IMDB, labelled good or bad
+      - Data available from keras.datasets module
+      - Data is pre-processed as sequences of integers
+      - Task: classify sentiment from review content
+      - Strategy: embed sentences, then learn structure with LSTM
+      
+      ```# Loading IMDB sentiment data
+      
+      from keras.preprocessing import sequence
+      from keras.models import Sequential
+      from keras.layers import Dense, Embedding
+      from keras.layers import LSTM
+      from keras.datasets import imdb
+      
+      max_features = 20000 #20000 most comment items
+      maxlen = 80          # sequences of length 80
+      
+      (x_trian, y_train), (x_test, y_test) = \
+          imdb.load_data(num_words=max_features)
+          
+      x_train = sequence.pad_sequences(x_train, maxlen=maxlen)
+      x_test = sequence.pad_sequences(x_test, maxlen=maxlen)
+      
+      model = Sequential()
+      model.add(Embedding(max_features, 128))
+      model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
+      model.add(Dense(1, activation='sigmoid'))
+      
+      #Run and evaluate model
+      model.compile(loss='binary_crossentropy',
+                    optimizer='sgd',
+                    metrics=['accuracy'])
+      
+      model.fit(x_train, y_train,
+                batch_size=32, epochs=15,
+                validation_data=(x_test, y_test))
+      
+      model.evaluate(x_test, y_test, batch_size=32)```
+      
+# Beyond sequential models: the functional API
+
+  - non-sequential models: Model
+  - Model can be trained and evaluated exactly like Sequential
+  - functional apis for Model starts with input(s)
+  - we then define output(s) by transforming input(s) iteratively
+  
+  ``` #Using the functional API
+  from keras.layers import Input, Dense
+  from keras.models import Model
+  
+  num_classes = 10
+  inputs = Input(shape=(784,))
+  
+  x = Dense(512, activation='relu')(inputs)
+  x = Dense(512, activation='relu')(x)
+  predictions = Dense(num_classes, activation='softmax')(x)
+  
+  #Defining and running a Model
+  model = Model(inputs=inputs, outputs=predictions)
+  model.compile(optimizer='sgd',
+                loss='categorical_crossentropy',
+                metrics=['accuracy'])
+                
+  model.fit(...) # same as before
+  ```
+
+# Serializing keras models
+
+  - keras models can be saved and loaded
+  - full model: architecture, weights and training configurations (HDF5)
+  - Architecture only (JSON or YAML)
+  - Weights only (HDF5)
+  
+  ```#Persisting architecture or weights
+  
+  from keras.models import model_from_json
+  
+  # Save model as JSON and weights as HDF5
+  json_string = model.to_json() # model.to_yaml()
+  model.save_weights('weights.h5')
+  
+  # Load from JSON and set weights
+  model = model_from_json(json_string
+  model.load_weights('weights.h5')
+  
+  # Persisting the full model
+  from keras.models import load_model
+  model.save('full_model.h5')
+  model = load_model('full_model.h5')```
+  
+
+  
+  
+  
+      
+      
+                
+      
     
 
     

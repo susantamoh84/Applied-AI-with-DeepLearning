@@ -25,28 +25,28 @@
     from keras.datasets import mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     
-    - #Define model
-    - model = Sequential()
+    #Define model
+    model = Sequential()
     
-    - #Add layers
-    - model.add(Dense(256, activation='sigmoid', input_shape=(784,)))
+    #Add layers
+    model.add(Dense(256, activation='sigmoid', input_shape=(784,)))
     
-    - #Compile model with loss and optimizer
-    - model.compile(loss='catgorical_crossentropy', optimizer=SGD(), metric=['accuracy'])
+    #Compile model with loss and optimizer
+    model.compile(loss='catgorical_crossentropy', optimizer=SGD(), metric=['accuracy'])
     
-    - #Train network
-    - model.fit(x_train, y_train, batch_size=128, apochs=10, validation_data=(x_test, y_test))```
+    #Train network
+    model.fit(x_train, y_train, batch_size=128, apochs=10, validation_data=(x_test, y_test))```
     
   - Install Keras
   
-    - #Install tensorflow backend
-    - pip install tensorflow
+    ```#Install tensorflow backend
+    pip install tensorflow
 
-    - #Optionally install other dependencies
-    - pip install h5py graphviz pydot
+    #Optionally install other dependencies
+    pip install h5py graphviz pydot
 
-    - #Install Keras
-    - pip install keras
+    #Install Keras
+    pip install keras```
   
   
 # Sequential Models:
@@ -72,33 +72,33 @@
   
   - Loss functions:
   
-    - #Option 1: Importing from loss module (preferred)
-    - from keras.losses import mean_squared_error
-    - model.compile(loss=mean_squared_error, optimizer=...)
+    ```#Option 1: Importing from loss module (preferred)
+    from keras.losses import mean_squared_error
+    model.compile(loss=mean_squared_error, optimizer=...)
     
-    - #Option 2: Using strings
-    - model.compile(loss='mean_squared_error', optimizer=...) <---- error prone because of typo
+    #Option 2: Using strings
+    model.compile(loss='mean_squared_error', optimizer=...) <---- error prone because of typo```
     
   - Optimizers:
   
-    - #Option 1: load optimizers from moddule ( preferred )
-    - from keras.optimizers import SGD
+    ```#Option 1: load optimizers from moddule ( preferred )
+    from keras.optimizers import SGD
     
-    - sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9)
-    - model.compile(loss=..., optimizer=sgd)
+    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9)
+    model.compile(loss=..., optimizer=sgd)
     
-    - #Option 2: pass string (default parameters will be used)
-    - model.compile(loss=..., optimizer='sgd')
+    #Option 2: pass string (default parameters will be used)
+    model.compile(loss=..., optimizer='sgd')```
     
   - Fit, evaluate and predict
   
-    - model.fit(x_train, y_train, batch_size=32, epochs=10, validation_data=(x_val, y_val))
+    ```model.fit(x_train, y_train, batch_size=32, epochs=10, validation_data=(x_val, y_val))
     
-    - #Evaluate on test data
-    - evaluate(x_test, y_test, batch_size=32)
+    #Evaluate on test data
+    evaluate(x_test, y_test, batch_size=32)
     
-    - #predict labels
-    - predict(x_test, batch_size=32)
+    #predict labels
+    predict(x_test, batch_size=32)```
     
     
   

@@ -17,25 +17,25 @@
   
   - A minimal Keras example:
   
-    - from keras.models import Sequential
-    - from keras.layers import Dense
-    - from keras.optimizers import SGD
+    from keras.models import Sequential
+    from keras.layers import Dense
+    from keras.optimizers import SGD
     
-    - #load data
-    - from keras.datasets import mnist
-    - (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    #load data
+    from keras.datasets import mnist
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
     
-    - #Define model
-    - model = Sequential()
+    #Define model
+    model = Sequential()
     
-    - #Add layers
-    - model.add(Dense(256, activation='sigmoid', input_shape=(784,)))
+    #Add layers
+    model.add(Dense(256, activation='sigmoid', input_shape=(784,)))
     
-    - #Compile model with loss and optimizer
-    - model.compile(loss='catgorical_crossentropy', optimizer=SGD(), metric=['accuracy'])
+    #Compile model with loss and optimizer
+    model.compile(loss='catgorical_crossentropy', optimizer=SGD(), metric=['accuracy'])
     
-    - #Train network
-    - model.fit(x_train, y_train, batch_size=128, apochs=10, validation_data=(x_test, y_test))
+    #Train network
+    model.fit(x_train, y_train, batch_size=128, apochs=10, validation_data=(x_test, y_test))
     
   - Install Keras
   

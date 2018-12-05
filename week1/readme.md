@@ -72,7 +72,7 @@
   
   - Loss functions:
   
-    ```#Option 1: Importing from loss module (preferred)
+    ``` #Option 1: Importing from loss module (preferred)
     from keras.losses import mean_squared_error
     model.compile(loss=mean_squared_error, optimizer=...)
     
@@ -81,7 +81,7 @@
     
   - Optimizers:
   
-    ```#Option 1: load optimizers from moddule ( preferred )
+    ``` #Option 1: load optimizers from moddule ( preferred )
     from keras.optimizers import SGD
     
     sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9)

@@ -289,18 +289,338 @@
   # Persisting the full model
   from keras.models import load_model
   model.save('full_model.h5')
-  model = load_model('full_model.h5')```
+  model = load_model('full_model.h5')
+  ```
   
+# Apache SystemML
 
+  - Provides a R-like language (DML) for data scientists to implement machine learning algorithms
+    - all notatons & conventions like R    
+  - Analyzes the statements and find the hirearchial execution plan for the statements
+  - creates a DAG for the execution of statements.  
+  - runs in embeddable, standaone, cluster (hybrid) mode  
+  - API in java, scala, python
   
-  
-  
-      
-      
-                
-      
-    
+# Invoking SystemML
 
+  - location of script: -f 
+  - -nargs be passed via -nvargs
+  - -exec option hybrid-spark or hybrid
+  
+  - Case 1: Data on disk/HDFS
+    - In-memory single node
     
+    ``` # Java Command Line:
     
+    $ java -cp SystemML.jar org.apache.sysml.api.DMLScript \
+    -f LinearRegCG.dml -exec singlenode -nvargs X=X.mtx Y=Y.mtx B=B.mtx
     
+    $ java -cp systemml-1.0.0-standalone.jar \
+    org.apache.sysml.api.DMLScript \
+    -f LinearRegCG.dml -nvargs X=X.mtx Y=Y.mtx B=B.mtx
+    ```
+    - In Hadoop
+    
+    ``` # Hadoop Command Line:
+    $ hadoop jar SystemML.jar \
+    -f LinearRegCG.dml -exec hybrid -nvargs X=X.mtx Y=Y.mtx B=B.mtx
+    ```    
+    - In Spark
+    
+    ``` # Spark Command Line:
+    $ spark-submit --master yarn-client SystemML.jar \
+    -f LinearRegCG.dml -nvargs X=X.mtx Y=Y.mtx B=B.mtx
+    ```
+    
+    - RDD/DataFrame
+    
+    ```$ spark-shell --jars SystemML.jar --driver-memory 3g
+    
+    import org.apache.sysml.api.mlcontext._
+    import org.apache.sysml.api.mlcontext.ScriptFactory._
+    val ml = new MLContext(sc)
+    val X = // ... RDD, DataFrame, etc.
+    val script = dmlFromFile("LinearRegCG.dml").in("X", X)
+                  .in(...).out("B")
+    val b = ml.execute(script).getDataFrame("B")
+    ```
+    
+    - Python MLContext API.
+    
+    ```$ pip install systemml
+    $ pip show systemml
+    $ pyspark --driver-memory 3g
+    
+    from systemml import MLContext, dmlFromFile
+    ml = MLContext(sc)
+    X = // ... RDD, DataFrame, NumPy, SciPy etc
+    script = dmlFromFile("LinearRegCG.dml").input("X", X)
+              .input(...).output("B")
+    b = ml.execute(script).getDataFrame("B")
+    ```
+    
+    - MLLearn API
+    
+    ```$ pip install systemml
+    $ pyspark --driver-memory 3g
+    
+    from systemml import LinearRegression
+    
+    train_df = // ... RDD, DF
+    regr = LinearRegression(spark)
+    regr.fit(train_df)              <---- sci-kit learn like apis
+    b = regr.predict(test_df)       <---- sci-kit learn like apis
+    ```
+    
+    - Experimental APIs: Keras2DML, Caffe2DML
+    
+    ```$ pip install systemml
+    $ pyspark --driver-memory 3g
+    
+    from systemml import Keras2DML
+    
+    train_df = // ... NumPy, SciPy
+    sysml_model = Keras2DML(spark, keras_model,...)
+    sysml_model.fit(train_df)              <---- sci-kit learn like apis
+    b = sysml_model.predict(test_df)       <---- sci-kit learn like apis
+    ```
+    
+    ```$ pip install systemml
+    $ pyspark --driver-memory 3g
+    
+    from systemml import Caffe2DML
+    
+    train_df = // ... RDD, DataFrame, Numpy, SciPy
+    sysml_model = Caffe2DML(spark, 'solver.proto',...)
+    sysml_model.fit(train_df)              <---- sci-kit learn like apis
+    b = sysml_model.predict(test_df)       <---- sci-kit learn like apis
+    ```      
+      
+# Demo - How to use Apache SystemML on IBM DSX (1/3)
+  
+  - SystemML 1.1 requires Spark 2.1 & above
+  - Example 1:
+      ``` from systemml import MLContext, dml
+
+      ml = MLContext(sc)  
+      print(ml.info()
+
+      # Create a simple DML script 'hello word'
+
+      script = dml("""
+      print('Hello World');
+      """)
+      ml.execute(script)
+
+      # Modify script to return a string
+      script = dml("""
+      s = 'Hello World'
+      """).output("s")
+
+      hello_world_str = ml.execute(script).get("s")
+
+      print(hello_world_str)
+      ```
+  - Example 2:
+  
+      ```import sys, os
+      import matplotlib.pyplot as plt
+      import numpy as np
+      from sklearn import datasets
+      plt.switch_backend('agg')
+      
+      # dml script for matrix multiplication
+      script = """
+          X = rand(rows=$nr, cols=1000, sparsity=0.5)
+          A = t(X) %*% X
+          s = sum(A)
+      """
+      prog = dml(script).input('$nr', 1e6).output('s') <---- input method to pass parameters to dml
+      s = ml.execute(prod).get('s')
+      print s
+      ```
+      
+  - Example 3:
+  
+      ```%matplotlib inline
+      diabetes = datasets.load_diabetes()
+      diabetes_X = diabetes.data[:, np.newaix, 2]
+      diabetes_X_train = diabetes_X[:-20]
+      diabetes_X_test = diabetes_X[-20:]
+      diabetes_y_train = np.matrix(diabetes.target[:-20]).T
+      diabetes_y_test = np.matrix(diabetes.target[-20:]).T
+      
+      plt.scatter(diabetes_X_train, diabetes_y_train, color="black") <---- scatter plot
+      plt.scatter(diabetes_y_test, diabetes_y_test, color="red")
+      
+      #linear regressopm dml
+      script = """
+          # add constant feature to X to model intercept
+          ones = matrix(1, rows=nrow(X), cols=1)
+          X = cbind(X, ones)
+          A = t(X) %*% X
+          b = t(X) %*% y
+          w = solve(A, b)
+          bias = as.scalar(w[nrow(w),1])
+          w = w[1:nrow(w)-1,]
+      """
+      
+      prog = dml(script).input(X=diabetes_X_train, y=diabetes_y_train).output("w", "bias")
+      w, bias = ml.execute(prog).get('w', 'bias')
+      w =  w.toNumPy()
+      
+      plt.scatter(diabetes_X_train, diabetes_y_train, color="black") <---- scatter plot
+      plt.scatter(diabetes_X_test, diabetes_y_test, color="red")
+      
+      plt.scatter(diabetes_X_test, (w*diabetes_X_test)+bias, color="blue", linestyle='dotted') <---- scatter plot
+      ```
+      
+  - Example 4: Linear Regression with batch Gradient Descent
+  
+      ```%matplotlib inline
+      #linear regression gradient descent dml
+      script = """
+          # add constant feature to X to model intercept
+          ones = matrix(1, rows=nrow(X), cols=1)
+          X = cbind(X, ones)
+          max_iter = 100
+          w = matrix(0, rows=ncol(X), cols=1)
+          for(i in 1:max_iter){
+            XtX = t(X) %*% x
+            dw = XtX %*% w - t(X) %*% y
+            alpha = (t(dw) %*% dw) / (t(dw) %*% XtX %*% dw)
+            w = w - dw*alpha
+          }
+          bias = as.scalar(w[nrow(w),1])
+          w = w[1:nrow(w)-1,]
+      """
+      
+      prog = dml(script).input(X=diabetes_X_train, y=diabetes_y_train).output("w", "bias")
+      w, bias = ml.execute(prog).get('w', 'bias')
+      w =  w.toNumPy()
+      
+      plt.scatter(diabetes_X_train, diabetes_y_train, color="black") <---- scatter plot
+      plt.scatter(diabetes_X_test, diabetes_y_test, color="red")
+      
+      plt.scatter(diabetes_X_test, (w*diabetes_X_test)+bias, color="blue", linestyle='dotted') <---- scatter plot
+      ```
+      
+  - Example 5: Conjugate Grident Method
+  
+      ```%matplotlib inline
+      #linear regression gradient descent dml
+      script = """
+          # add constant feature to X to model intercept
+          ones = matrix(1, rows=nrow(X), cols=1)
+          X = cbind(X, ones)
+          m = ncol(X); i = 1
+          max_iter = 20
+          w = matrix(0, rows=ncol(X), cols=1)
+          dw = - t(X) %*% y; p = - dw
+          norm_r2 = sum (dw ^ 2)
+          for(i in 1:max_iter){
+            q = t(X) %*% ( X %*% p )
+            alpha = norm_r2 / sum( p * q)
+            w = w + alpha * P
+            dw = dw + alpha * q
+            old_norm_r2 = norm_r2; norm_r2 = sum(dw ^ 2);
+            p = -d2 + (norm_r2 / old_norm_r2) * p
+            i = i + 1;
+          }
+          bias = as.scalar(w[nrow(w),1])
+          w = w[1:nrow(w)-1,]
+      """
+      
+      prog = dml(script).input(X=diabetes_X_train, y=diabetes_y_train).output("w", "bias")
+      w, bias = ml.execute(prog).get('w', 'bias')
+      w =  w.toNumPy()
+      
+      plt.scatter(diabetes_X_train, diabetes_y_train, color="black") <---- scatter plot
+      plt.scatter(diabetes_X_test, diabetes_y_test, color="red")
+
+      plt.scatter(diabetes_X_test, (w*diabetes_X_test)+bias, color="blue", linestyle='dotted') <---- scatter plot
+      ```
+  - Example 5: Invoke existing dml script     
+      
+      ```
+      from systemml import dmlFromResource
+      
+      prog = dmlFromResource('scripts/algorithms/LinearRegDS.dml')
+                .input(X=diabetes_X_train, y=diabetes_y_train)
+                .input('$icpt', 1.0).output("beta_out")
+      w = ml.execute(prog).get('beta_out')
+      w =  w.toNumPy()
+      
+      plt.scatter(diabetes_X_train, diabetes_y_train, color="black") <---- scatter plot
+      plt.scatter(diabetes_X_test, diabetes_y_test, color="red")
+
+      plt.scatter(diabetes_X_test, (w*diabetes_X_test)+bias, color="blue", linestyle='dotted') <---- scatter plot
+      ```
+
+  - Example 6: Invoke existing dml script using scitkit-learn
+      
+      ```
+      from pyspark.sql import SQLContext
+      from systemml.mllearn import LinearRegression
+      sqlCtx = SQLContext(sc)
+      
+      regr = LinearRegression(sqlCtx)
+      regr.fit(diabetes_X_train, diabetes_y_train)
+      predictions = regr.predict(
+      
+      plt.scatter(diabetes_X_train, diabetes_y_train, color="black") <---- scatter plot
+      plt.scatter(diabetes_X_test, diabetes_y_test, color="red")
+
+      plt.scatter(diabetes_X_test, (w*diabetes_X_test)+bias, color="blue", linestyle='dotted') <---- scatter plot
+      ```    
+    
+  - Example 7: Invoke keras model with systemml ( Requirement install OpenBLAS )
+      
+      ```
+      from mlxtend.data import mnist_data
+      import numpy as np
+      from sklearn.utils import shuffle
+      
+      #Download the MNIST dataset
+      X, y = mnist_data()
+      X, y = shuffle(X, y)
+      
+      #Split the data into training and test
+      n_samples = len(X)
+      X_train = X[:int(0.9 * n_samples)]
+      y_train = y[:int(0.9 * n_samples)]
+      X_test = X[int(0.9 * n_samples):]
+      y_test = y[int(0.9 * n_samples):]
+      
+      #import keras
+      from keras.models import Sequential
+      from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Dropout, Flatten
+      from keras import backend as K
+      from keras.models import Model
+      
+      #Create the network
+      input_shape = (1,28,28) if K.image_data_format() == 'channels_first else (28,28,1))
+      keras_model = Sequential()
+      keras_model.add(Conv2D(32, kernel_size=(5, 5), activation='relu', input_shape=input_shape, padding="same"))
+      keras_model.add(MaxPooling2D(pool_size=(2, 2)))
+      keras_model.add(Conv2D(64, kernel_size=(5, 5), activation='relu', padding="same"))
+      keras_model.add(MaxPooling2D(pool_size=(2, 2)))
+      keras_model.add(Flatten())
+      keras_model.add(Dense(512, activation='relu'))
+      keras_model.add(Dropout(0.5))
+      keras_model.add(Dense(10, activation='softmax'))
+      
+      #Scale the input features
+      scale = 0.00390625
+      X_train = X_train * scale
+      X_test = X_test * scale
+      
+      #Train the model
+      from systemml.mllearn import Keras2DML
+      sysml_model = Keras2DML(spark, keras_model, input_shape=(1,28,28), weights='weights_dir')
+      sysml_model.setConfigProperty('sysml.native.bias', 'openbias')
+      sysml_model.setConfigProperty('sysml.native.bias.directory', os.path.join(os.getcwd(), 'OpenBLAS-0.2.20/'))
+      # sysml_model.setGPU(True).setForceGPU(True)
+      sysml_model.summary()
+      sysml_model.fit(X_train, y_train)
+      ```

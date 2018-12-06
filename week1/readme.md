@@ -688,4 +688,14 @@
       --files iris.txt |
       dl4j-quickstart-1.0-SNAPSHOT-jar-with-dependencies.jar
     
-    
+# DL4J Neural Network Code Example
+
+  - Feed Forward Neural Network
+  - Classification of HandWritten Digits
+  - [code](https://github.com/smohapat84/deeplearning4j-examples/blob/master/dl4j-examples/src/main/java/org/deeplearning4j/examples/feedforward/mnist/MLPMnistSingleLayerExample.java)
+
+# PyTorch
+
+
+  
+  

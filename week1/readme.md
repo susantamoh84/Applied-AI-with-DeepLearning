@@ -307,8 +307,7 @@
   - -nargs be passed via -nvargs
   - -exec option hybrid-spark or hybrid
   
-  - Case 1: Data on disk/HDFS
-    - In-memory single node
+  - Case: In-memory single node
     
     ``` # Java Command Line:
     
@@ -319,20 +318,20 @@
     org.apache.sysml.api.DMLScript \
     -f LinearRegCG.dml -nvargs X=X.mtx Y=Y.mtx B=B.mtx
     ```
-    - In Hadoop
+  - Case: In Hadoop
     
     ``` # Hadoop Command Line:
     $ hadoop jar SystemML.jar \
     -f LinearRegCG.dml -exec hybrid -nvargs X=X.mtx Y=Y.mtx B=B.mtx
     ```    
-    - In Spark
+  - Case: In Spark
     
     ``` # Spark Command Line:
     $ spark-submit --master yarn-client SystemML.jar \
     -f LinearRegCG.dml -nvargs X=X.mtx Y=Y.mtx B=B.mtx
     ```
     
-    - RDD/DataFrame
+  - Case: RDD/DataFrame
     
     ```$ spark-shell --jars SystemML.jar --driver-memory 3g
     
@@ -345,7 +344,7 @@
     val b = ml.execute(script).getDataFrame("B")
     ```
     
-    - Python MLContext API.
+  - Case: Python MLContext API.
     
     ```$ pip install systemml
     $ pip show systemml
@@ -359,7 +358,7 @@
     b = ml.execute(script).getDataFrame("B")
     ```
     
-    - MLLearn API
+  - Case: MLLearn API
     
     ```$ pip install systemml
     $ pyspark --driver-memory 3g
@@ -372,7 +371,7 @@
     b = regr.predict(test_df)       <---- sci-kit learn like apis
     ```
     
-    - Experimental APIs: Keras2DML, Caffe2DML
+  - Case: Experimental APIs: Keras2DML, Caffe2DML
     
     ```$ pip install systemml
     $ pyspark --driver-memory 3g

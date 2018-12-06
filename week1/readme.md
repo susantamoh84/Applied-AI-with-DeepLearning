@@ -395,7 +395,7 @@
     b = sysml_model.predict(test_df)       <---- sci-kit learn like apis
     ```      
       
-# Demo - How to use Apache SystemML on IBM DSX (1/3)
+# Demo - How to use Apache SystemML on IBM DSX
   
   - SystemML 1.1 requires Spark 2.1 & above
   - Example 1:
@@ -623,3 +623,6 @@
       sysml_model.summary()
       sysml_model.fit(X_train, y_train)
       ```
+
+# Introduction to DeepLearning4j
+

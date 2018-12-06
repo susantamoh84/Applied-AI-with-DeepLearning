@@ -679,7 +679,7 @@
 
   - In the python notebookx execute following:
     - !java -cp dl4j-quickstart-1.0-SNAPSHOT-jar-with-dependencies.jar skymind.dsx.IrisClassifier
-    - ![code](https://github.com/susantamoh84/DeepLearning4J-Application/blob/master/src/main/java/skymind/dsx/IrisClassifier.java)
+    - [code](https://github.com/susantamoh84/DeepLearning4J-Application/blob/master/src/main/java/skymind/dsx/IrisClassifier.java)
 
   - In Spark:
     - !$SPARK_HOME/bin/spark-submit \

@@ -696,6 +696,143 @@
 
 # PyTorch
 
+  - Install
+  - !pip install http://download.pytorch.org/whl/cu80/torch-0.3.0.post4-cp27-cp27mu-linux_x86_64.whl
+  - !pip install torchvision
+  
+  - import torch
+  
+# PyTorch Packages
 
+  - Torch Library 
+    - import torch
+    - import torch.autograd as autograd
+    - import torch.nn as nn
+    - import torch.optim as optim             <-- algorithms like adam, rmsprop, gradient descent
+
+    - torch.manual_seed(123)
   
+  -  Creating Tensors
+    - v_tensor = torch.Tensor([1,2,3])
+    - m2x3_tensor = torch.Tensor([[1,2,3], [4,5,6]])    
+    - Random Tensor = tourch.randn((4, 3, 3, 3))
+    
+# Math Computation with tensors
+
+  - x = torch.Tensor([1, 2, 3])
+  - y = torch.Tensor([4, 5, 6])
+  - w = torch.matmul(x, y)       <--- dot product, scalar multiplication
   
+  - x_1 = torch.randn(2, 5)
+  - y_1 = torch.randn(3, 5)
+  - z_1 = torch.cat([x_1, y_1]) <--- 5x5
+  
+  - x_2 = torch.randn(2, 3)
+  - y_2 = torch.randn(2, 5)
+  - z_2 = torch.cat([x_2, y_2], 1) <--- 2x8
+  
+  - Reshaping Tensor:
+  
+    - x = torch.randn(64000, 3, 28, 28)
+    - x_reshaped = x.view(32, -1, 3, 28, 28)
+    - print(x_reshaped.shape)               <------ 32x2000x3x28x28
+    
+  - Computation Graph, CUDA
+  
+    - In Keras once model.compile() is called, the graph is fixed and will not change throughout the life-time
+    - Run-time changing computational graph is possible in PyTorch
+    
+    ```
+    x = autograd.Variable(torch.Tensor([1,2,3]), requires_grad=True)
+    print(x.data)
+    
+    y = autograd.Variable(torch.Tensor([4,5,6]), requires_grad=True)
+    
+    z = x + y
+    print(z.data)
+    
+    operation = z.grad_fn
+    print(operation)
+    
+    s = z.sum()
+    print(s)
+    print(s.grad_fn)
+    
+    s.backward(retain_graph=True)
+    
+    print(x)
+    print(x.grad)
+    ```
+  - CUDA check:
+    - if torch.cuda.is_available() ....
+    
+# Linear Model:
+
+    ```
+    import torch
+    import torch.nn as nn
+    from torch.autograd import Variable
+    import numpy as np
+
+    x = [i for i in range(20)] #list comprehension
+    x_train = np.array(x, dtype=np.float32)
+    x_train = x_train.reshape(-1, 1)
+    print(x)
+    print(x_train.shape)
+
+    y = [(5*i + 2) for i in x] #list comprehension
+    y_train = np.array(y, dtype=np.float32)
+    y_train = y_train.reshape(-1, 1)
+    print(y)
+    print(y_train.shape)
+
+    #Create Model Class
+    class LinearRegressor(nn.Module):                   <--- import class from module nn.Module
+      def __init__(self, input_dim, output_dim):
+        super(LinearRegressor, self).__init__()
+        self.linear = nn.Linear(input_dim, output_dim)
+
+      def forward(self, x):
+        out = self.linear(x)
+        return out
+
+    input_dim = 1
+    output_dim = 1
+
+    model = LinearRegressor(input_dim, output_dim)
+
+    model
+
+    #Loss & Optimizer
+    loss_function = nn.MSELoss()
+
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
+    optimizer
+
+    epochs = 500
+
+    for epoch in range(epochs):
+      epoch += 1
+      #Convert input & out to torch vectors
+      inputs = Variable(torch.from_numpy(x_train))
+
+      real_outputs = Variable(torch.numpy(y_train))
+
+      # Reset Gradients
+      optimizer.zero_grad()
+
+      # Forward - compute the output
+      pred_outputs = model(inputs)
+
+      # Loss
+      loss = loss_function(pred_outputs, real_outputs)
+
+      # Backward - compute gradients
+      loss.backward()
+
+      # Update parameters
+      optimizer.step()
+
+      print('epoch {}, loss{}'.format(epoch, loss.data[0]))
+    ```
+

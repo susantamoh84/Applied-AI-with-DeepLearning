@@ -626,3 +626,66 @@
 
 # Introduction to DeepLearning4j
 
+  - Deep Learning on JVM
+  - DataVec
+    - Tools For ETL
+    - get your data => numeric array
+  - ND4J
+    - Numeric Arrays
+    - NumPy for the JVM
+  - libnd4j
+    - Native Libraries for GPUs/CPUs
+  - DeepLearning4j
+    
+  - Data Sources
+    - Log files
+    - Text documents
+    - Tabular data
+    - Images and video
+    
+  - DataVec Features
+    - Transformation
+      - categorical to one hot
+      - joining
+    - Scaling
+      - Normalization
+      - Standardization
+    - Shuffling
+    - Shuffling and splitting to train and test data
+    
+    - Options for Extracting Labels
+      - Label in File Path:
+        - Path Label Generator
+        - Parent Path Label Generator
+      - Label in CSV Data:
+        - Provide labelindex to RecordReaderDataSetIterator
+    - RecordReaders
+      - Read files or input, convert to List of Writables
+    - Normalizers
+      - Standardise, scale or normalize the data
+    - Transform Process
+      - Join datasets, replace strings with numerics, extract labels
+    - list of available record readers:
+      - https://deeplearning4j.org/etl-userguide
+    - Available ND4J Pre-Processors
+      - ImagePreProcessingScaler
+        - min max scaling default 0+-1
+      - NomralizerMinMaxScaler
+        - Scale values observed min -> 0, observed max -> 1
+      - NormalizeStandardize
+        - Moving column wise variance and mean
+        
+# Demo Java in Data Science Experience
+
+  - In the python notebookx execute following:
+    - !java -cp dl4j-quickstart-1.0-SNAPSHOT-jar-with-dependencies.jar skymind.dsx.IrisClassifier
+    - ![code](https://github.com/susantamoh84/DeepLearning4J-Application/blob/master/src/main/java/skymind/dsx/IrisClassifier.java)
+
+  - In Spark:
+    - !$SPARK_HOME/bin/spark-submit \
+      --class skymind.dsx.IrisClassifier \
+      --master $MASTER \
+      --files iris.txt |
+      dl4j-quickstart-1.0-SNAPSHOT-jar-with-dependencies.jar
+    
+    

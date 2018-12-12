@@ -11,5 +11,4 @@
   - [Example Data](https://csegroups.case.edu/bearingdatacenter/pages/download-data-file)
   
   - Matlab files (.mat)
-  -
   
